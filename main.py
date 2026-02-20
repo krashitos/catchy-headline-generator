@@ -4,6 +4,7 @@ import logging
 from typing import List
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import google.generativeai as genai
 from dotenv import load_dotenv
@@ -17,18 +18,13 @@ logger = logging.getLogger(__name__)
 
 # Configure Gemini
 api_key = os.getenv("GOOGLE_API_KEY")
-if not api_key:
-    # Attempt to get from environment or fallback to a placeholder if it's handled by Antigravity's system
-    # In this environment, the agent usually has access to the tool for LLM calls or the key is injected.
-    # However, since I'm building a standalone webapp, I'll expect it in .env or system env.
-    logger.warning("GOOGLE_API_KEY not found in environment variables.")
-
-genai.configure(api_key=api_key)
+if api_key:
+    genai.configure(api_key=api_key)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
-app = FastAPI(title="Catchy Headline Generator API")
+app = FastAPI(title="Catchy Headline Generator")
 
-# Enable CORS for frontend interaction
+# Enable CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -36,16 +32,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# --- Pydantic Models ---
 class TopicRequest(BaseModel):
     topic: str
 
 class HeadlineResponse(BaseModel):
     headlines: List[str]
 
+# --- Static File Serving ---
 @app.get("/")
-async def root():
-    return {"message": "Catchy Headline Generator API is running"}
+async def serve_index():
+    return FileResponse('index.html')
 
+@app.get("/style.css")
+async def serve_css():
+    return FileResponse('style.css')
+
+@app.get("/script.js")
+async def serve_js():
+    return FileResponse('script.js')
+
+# --- API Endpoints ---
 @app.post("/generate", response_model=HeadlineResponse)
 async def generate_headlines(request: TopicRequest):
     if not request.topic:
@@ -59,10 +66,13 @@ async def generate_headlines(request: TopicRequest):
     """
     
     try:
+        if not api_key:
+            raise ValueError("No API Key configured")
+            
         response = model.generate_content(prompt)
         text = response.text.strip()
         
-        # Clean up Markdown formatting if present
+        # Clean up Markdown formatting
         if text.startswith("```json"):
             text = text[7:]
         if text.endswith("```"):
@@ -77,8 +87,8 @@ async def generate_headlines(request: TopicRequest):
     
     except Exception as e:
         logger.error(f"Error generating headlines: {e}")
-        # Mock fallback for demonstration
-        fallback_headlines = [
+        # Fallback Headlines
+        fallback = [
             f"10 {request.topic} Secrets You Never Knew",
             f"Why Your {request.topic} Routine Is Failing (And How to Fix It)",
             f"The Ultimate Guide to Mastering {request.topic} in 2025",
@@ -90,7 +100,7 @@ async def generate_headlines(request: TopicRequest):
             f"Transform Your Life with These {request.topic} Hacks",
             f"The Future of {request.topic}: What to Expect Next"
         ]
-        return HeadlineResponse(headlines=fallback_headlines)
+        return HeadlineResponse(headlines=fallback)
 
 if __name__ == "__main__":
     import uvicorn
