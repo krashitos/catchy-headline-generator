@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catchy Headline Generator | Viral Video & Blog Titles</title>
+    <meta name="description"
+        content="Generate 10 click-worthy, viral headlines for your YouTube videos or blogs instantly with AI.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <main class="container">
+        <header class="header">
+            <div class="logo">
+                <span class="icon">⚡</span>
+                <h1>HeadlineGenerator</h1>
+            </div>
+            <p class="subtitle">Transform your topics into magnetic, click-worthy titles</p>
+        </header>
+
+        <section class="generator-box glass">
+            <div class="input-group">
+                <input type="text" id="topicInput" placeholder="Enter your topic (e.g., Fitness, AI, Cooking)"
+                    aria-label="Topic Input">
+                <button id="generateBtn" class="primary-btn">
+                    <span class="btn-text">Generate Viral Titles</span>
+                    <span class="loader hidden"></span>
+                </button>
+            </div>
+            <p class="hint">10 click-worthy titles in seconds. Powered by Gemini AI.</p>
+        </section>
+
+        <section id="resultsSection" class="results-section hidden">
+            <div class="results-header">
+                <h2>Your Viral Headlines</h2>
+                <button id="copyAllBtn" class="secondary-btn">Copy All</button>
+            </div>
+            <div id="headlinesList" class="headlines-list">
+                <!-- Headlines will be injected here -->
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
